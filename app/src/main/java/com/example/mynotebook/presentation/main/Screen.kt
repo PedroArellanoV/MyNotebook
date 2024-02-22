@@ -1,11 +1,14 @@
 package com.example.mynotebook.presentation.main
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -17,8 +20,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.example.mynotebook.presentation.utils.TabItem
-import com.example.mynotebook.presentation.utils.TabItem.*
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.mynotebook.R
+import com.example.mynotebook.presentation.notes.NotesScreen
+import com.example.mynotebook.presentation.utils.TabItem.Calendar
+import com.example.mynotebook.presentation.utils.TabItem.Notes
+import com.example.mynotebook.presentation.utils.TabItem.Tasks
+import com.example.mynotebook.ui.theme.onSelect
+import com.example.mynotebook.ui.theme.terciary
+import dagger.hilt.android.qualifiers.ApplicationContext
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -33,35 +46,69 @@ fun MainScreen() {
         tabItems.size
     }
 
-    LaunchedEffect(selectedTabIndex){
+    LaunchedEffect(selectedTabIndex) {
         pagerState.animateScrollToPage(selectedTabIndex)
     }
-    LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress){
-        if(!pagerState.isScrollInProgress){
+    LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
+        if (!pagerState.isScrollInProgress) {
             selectedTabIndex = pagerState.currentPage
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        TabRow(selectedTabIndex = selectedTabIndex) {
-            tabItems.forEachIndexed { index, item ->
-                Tab(
-                    selected = index == selectedTabIndex,
-                    onClick = { selectedTabIndex = index },
-                    text = { Text(text = stringResource(id = item.title)) }
-                )
-            }
-        }
-        HorizontalPager(
+    Scaffold { padding ->
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
-            state = pagerState
         ) {
-            
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.app_name),
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = onSelect
+                )
+            }
+            TabRow(selectedTabIndex = selectedTabIndex) {
+                tabItems.forEachIndexed { index, item ->
+                    val isSelected = pagerState.currentPage == index
+                    Tab(
+                        selected = index == selectedTabIndex,
+                        onClick = { selectedTabIndex = index },
+                        text = {
+                            Text(
+                                text = stringResource(id = item.title),
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                                color = if (isSelected) onSelect else terciary
+                            )
+                        }
+                    )
+                }
+            }
+            HorizontalPager(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                state = pagerState
+            ) {
+                Box(
+                    modifier = Modifier
+                        .padding(padding)
+                ){
+                    when(selectedTabIndex){
+                        0->{
+                            NotesScreen(
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                        1->{}
+                        2->{}
+                    }
+                }
+            }
         }
     }
 }
