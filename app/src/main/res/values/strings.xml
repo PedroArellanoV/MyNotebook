@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">My Notebook</string>
+
+
+    <!-- Tab Items-->
+    <string name="notes_item">Notes</string>
+    <string name="task_item">Tasks</string>
+    <string name="calendar_item">Calendar</string>
+</resources>
