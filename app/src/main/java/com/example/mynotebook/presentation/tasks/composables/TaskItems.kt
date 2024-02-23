@@ -1,11 +1,12 @@
-package com.example.mynotebook.presentation.notes.composables
+package com.example.mynotebook.presentation.tasks.composables
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,29 +14,30 @@ import androidx.compose.ui.unit.dp
 import com.example.mynotebook.ui.theme.Typography
 
 @Composable
-fun NotesItem(
+fun TaskItem(
     title: String,
-    content: String,
+    state: Boolean,
+    id: Int,
     modifier: Modifier
-) {
+){
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 180.dp)
-    ){
-        Column(
+            .padding(4.dp)
+            .height(60.dp)
+    ) {
+        Row (
             modifier = Modifier
-                .padding(8.dp)
-        ) {
+                .fillMaxSize()
+        ){
             Text(
                 text = title,
-                maxLines = 1,
-                style = Typography.titleSmall
+                style = Typography.titleMedium,
+                maxLines = 1
             )
-            Text(
-                text = content,
-                maxLines = 6,
-                style = Typography.bodySmall
+            Checkbox(
+                checked = state,
+                onCheckedChange = {}
             )
         }
     }

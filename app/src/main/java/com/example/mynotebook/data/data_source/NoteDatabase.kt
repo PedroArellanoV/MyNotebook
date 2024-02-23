@@ -8,10 +8,10 @@ import com.example.mynotebook.domain.notes.model.NoteModel
     entities = [NoteModel::class],
     version = 1
 )
-abstract class NoteDatabase: RoomDatabase() {
+abstract class NoteDatabase : RoomDatabase() {
     abstract val noteDao: NoteDao
 
-    companion object{
+    companion object {
         const val NOTE_DATABASE_NAME = "notes_db"
     }
 }

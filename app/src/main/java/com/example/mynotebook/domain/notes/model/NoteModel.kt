@@ -9,3 +9,6 @@ data class NoteModel(
     val content: String,
     @PrimaryKey val id: Int? = null
 )
+
+class InvalidNoteException(message: String) : Exception(message)
+

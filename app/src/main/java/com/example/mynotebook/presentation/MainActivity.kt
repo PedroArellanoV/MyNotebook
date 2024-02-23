@@ -10,7 +10,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import com.example.mynotebook.presentation.main.MainScreen
+import com.example.mynotebook.presentation.utils.Navigation
 import com.example.mynotebook.ui.theme.MyNotebookTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,7 +27,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen()
+                    val navController = rememberNavController()
+                    Navigation(navController)
                 }
             }
         }

@@ -1,54 +1,55 @@
 package com.example.mynotebook.presentation.notes
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.mynotebook.presentation.notes.composables.NotesItem
+import com.example.mynotebook.presentation.utils.Screens
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun NotesScreen(
-    modifier: Modifier,
-    viewModel: NotesViewModel = hiltViewModel()
+    viewModel: NotesViewModel = hiltViewModel(),
+    navController: NavController
 ) {
-    val notesList = viewModel.notesList.value
+    val notesList = viewModel.noteList.value
     val scope = rememberCoroutineScope()
 
-
-    Scaffold(
-        modifier = modifier,
-        floatingActionButton = {
-            FloatingActionButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    imageVector = Icons.Default.Add, contentDescription = "Add Note"
-                )
-            }
-        }
-    ) {
+    LaunchedEffect(viewModel){
+        viewModel.getNotes()
+    }
+    
+    Scaffold {
         LazyVerticalGrid(
             modifier = Modifier
-                .padding(it)
                 .fillMaxSize(),
             columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(16.dp)
+            contentPadding = PaddingValues(8    .dp)
         ) {
-            items(notesList) { notes ->
+            items(notesList) { note ->
                 NotesItem(
-                    title = notes.title,
-                    content = notes.content
+                    title = note.title,
+                    content = note.content,
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .clickable {
+                            navController.navigate(
+                                Screens.AddEditNotesScreen.route + "?noteId=${note.id}"
+                            )
+                        }
                 )
             }
         }
