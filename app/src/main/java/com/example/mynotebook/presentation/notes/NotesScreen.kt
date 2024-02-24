@@ -44,6 +44,10 @@ fun NotesScreen(
                 NotesItem(
                     title = note.title,
                     content = note.content,
+                    isFav = note.isFav,
+                    onFavChange = {
+                            viewModel.onFavChange(note)
+                    },
                     modifier = Modifier
                         .padding(8.dp)
                         .clickable {

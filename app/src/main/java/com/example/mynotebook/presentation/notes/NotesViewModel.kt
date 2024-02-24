@@ -25,4 +25,16 @@ class NotesViewModel @Inject constructor(
 
         }
     }
+
+    fun onFavChange(item: NoteModel){
+        val newItem = NoteModel(
+            title = item.title,
+            content = item.content,
+            isFav = !item.isFav,
+            id = item.id
+        )
+        viewModelScope.launch {
+            noteUseCases.addNote.invoke(newItem)
+        }
+    }
 }

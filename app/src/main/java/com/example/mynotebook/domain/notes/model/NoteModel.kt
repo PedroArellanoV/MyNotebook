@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class NoteModel(
     val title: String,
     val content: String,
+    val isFav: Boolean,
     @PrimaryKey val id: Int? = null
 )
 

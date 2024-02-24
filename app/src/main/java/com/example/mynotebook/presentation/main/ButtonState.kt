@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Task
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class ButtonState(
@@ -22,8 +23,8 @@ sealed class ButtonState(
     data class TaskScreen(
         val navigateToTask: () -> Unit
     ) : ButtonState(
-        imageVector = Icons.Default.Delete,
-        contentDescription = "Add Note",
+        imageVector = Icons.Default.Add,
+        contentDescription = "Add task",
         onClickEvent = navigateToTask
     )
 

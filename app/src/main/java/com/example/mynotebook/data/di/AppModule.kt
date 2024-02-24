@@ -35,7 +35,8 @@ object AppModule {
             app,
             NoteDatabase::class.java,
             NoteDatabase.NOTE_DATABASE_NAME
-        ).build()
+        )
+            .build()
     }
 
     @Provides

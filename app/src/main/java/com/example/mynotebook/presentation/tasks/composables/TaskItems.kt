@@ -7,9 +7,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,7 +29,6 @@ fun TaskItem(
     title: String,
     state: Boolean,
     hour: String,
-    id: Int,
     modifier: Modifier,
     onCheckedChange: () -> Unit
 ) {
@@ -63,7 +67,23 @@ fun TaskItem(
                 )
                 Switch(
                     checked = state,
-                    onCheckedChange = { onCheckedChange() }
+                    onCheckedChange = { onCheckedChange() },
+                    thumbContent = {
+                        if (state) {
+                            Icon(
+                                modifier = Modifier.size(18.dp, 18.dp),
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null
+                            )
+                        } else {
+                            Icon(
+                                modifier = Modifier.size(18.dp, 18.dp),
+                                imageVector = Icons.Default.Close,
+                                contentDescription = null
+                            )
+                        }
+
+                    }
                 )
             }
 

@@ -33,6 +33,8 @@ class AddEditTaskViewModel @Inject constructor(
     private val _eventFlow = MutableSharedFlow<TaskUiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
+    private var currentTaskId: Int? = null
+
     private val _alarmState = mutableStateOf(
         AlarmState(
             isActive = false,
@@ -41,8 +43,29 @@ class AddEditTaskViewModel @Inject constructor(
     )
     val alarmState: State<AlarmState> = _alarmState
 
+
+    init {
+        savedStateHandle.get<Int>("taskId")?.let { taskId ->
+            if (taskId != -1) {
+                viewModelScope.launch {
+                    taskUseCases.getTaskById(taskId)?.also { task ->
+                        currentTaskId = task.id
+                        _taskTitle.value = task.title
+                        _taskDescription.value = task.description
+                        _taskState.value = task.state
+                    }
+                }
+            }
+        }
+    }
+
+
     fun onTitleChanged(newTitle: String) {
         _taskTitle.value = newTitle
+    }
+
+    fun onDescriptionChanged(newDescription: String){
+        _taskDescription.value = newDescription
     }
 
     fun onStateChanged(newState: Boolean) {

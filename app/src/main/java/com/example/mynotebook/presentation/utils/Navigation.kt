@@ -31,7 +31,16 @@ fun Navigation(navController: NavController){
         ){
             AddEditNoteScreen(navController = navController)
         }
-        composable(route = Screens.AddEditTaskScreen.route){
+        composable(route = Screens.AddEditTaskScreen.route + "?taskId={taskId}",
+            arguments = listOf(
+                navArgument(
+                    name = "taskId"
+                ){
+                    type = NavType.IntType
+                    defaultValue = -1
+                }
+            )
+        ){
             AddEditTaskScreen(navController = navController)
         }
     }

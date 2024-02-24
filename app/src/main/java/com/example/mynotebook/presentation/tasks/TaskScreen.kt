@@ -13,6 +13,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.mynotebook.domain.task.model.TaskModel
 import com.example.mynotebook.presentation.tasks.composables.TaskItem
+import com.example.mynotebook.presentation.utils.Screens
 import kotlin.concurrent.timerTask
 
 @Composable
@@ -36,11 +37,13 @@ fun TaskScreen(
                 TaskItem(
                     title = task.title,
                     state = task.state,
-                    id = task.id ?: -1,
                     hour = "10:00am",
-                    onCheckedChange = { /*TODO*/ },
+                    onCheckedChange = { viewModel.onStateChanged(task) },
                     modifier = Modifier
-                        .clickable { })
+                        .clickable {
+                            navController.navigate(Screens.AddEditTaskScreen.route + "?taskId=${task.id}")
+                        }
+                )
             }
         }
     }

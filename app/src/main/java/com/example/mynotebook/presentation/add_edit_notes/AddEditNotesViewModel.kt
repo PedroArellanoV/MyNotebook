@@ -41,6 +41,7 @@ class AddEditNotesViewModel @Inject constructor(
                         currentNoteId = note.id
                         _noteTitle.value = note.title
                         _noteContent.value = note.content
+                        _noteFavState.value = note.isFav
                     }
                 }
             }
@@ -66,6 +67,7 @@ class AddEditNotesViewModel @Inject constructor(
                     NoteModel(
                         title = noteTitle.value,
                         content = noteContent.value,
+                        isFav = noteFavState.value,
                         id = currentNoteId
                     )
                 )
@@ -87,6 +89,7 @@ class AddEditNotesViewModel @Inject constructor(
                 NoteModel(
                     noteTitle.value,
                     noteContent.value,
+                    noteFavState.value,
                     currentNoteId
                 )
             )

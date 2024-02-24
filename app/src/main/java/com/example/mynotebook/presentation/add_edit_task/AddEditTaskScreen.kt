@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChipDefaults
@@ -61,6 +63,7 @@ fun AddEditTaskScreen(
 ) {
 
     val taskTitle = viewModel.taskTitle.value
+    val taskDescription = viewModel.taskDescription.value
     val taskState = viewModel.taskState.value
     val taskAlarm = viewModel.alarmState.value
 
@@ -121,6 +124,22 @@ fun AddEditTaskScreen(
                         checked = taskState,
                         onCheckedChange = { state ->
                             viewModel.onStateChanged(state)
+                        },
+                        thumbContent = {
+                            if (taskState) {
+                                Icon(
+                                    modifier = Modifier.size(18.dp, 18.dp),
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null
+                                )
+                            } else {
+                                Icon(
+                                    modifier = Modifier.size(18.dp, 18.dp),
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = null
+                                )
+                            }
+
                         }
                     )
                 }
@@ -141,6 +160,18 @@ fun AddEditTaskScreen(
                     .padding(16.dp),
                 label = { Text(text = "Task name") },
                 maxLines = 1
+            )
+            OutlinedTextField(
+                value = taskDescription,
+                onValueChange = { description ->
+                    viewModel.onDescriptionChanged(description)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                label = { Text(text = "Description") },
+                minLines = 5,
+                maxLines = 5
             )
             if(taskAlarm.isActive){
                 Row(

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -104,7 +105,7 @@ fun AddEditNoteScreen(
                     viewModel.onSaveNote()
                 }
             ) {
-                Icon(imageVector = Icons.Default.Save, contentDescription = "Save note")
+                Icon(imageVector = Icons.Default.Check, contentDescription = "Save note")
             }
         }
     ) { pd ->
@@ -125,7 +126,8 @@ fun AddEditNoteScreen(
                     .fillMaxWidth()
                     .padding(top = 16.dp),
                 textStyle = MaterialTheme.typography.headlineSmall,
-                label = { Text(text = stringResource(id = R.string.note_title)) }
+                label = { Text(text = stringResource(id = R.string.note_title)) },
+                maxLines = 1
             )
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(

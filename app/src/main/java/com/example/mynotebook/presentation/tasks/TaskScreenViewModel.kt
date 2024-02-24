@@ -24,4 +24,17 @@ class TaskScreenViewModel @Inject constructor(
             }
         }
     }
+
+    fun onStateChanged(task: TaskModel){
+        val newItem = TaskModel(
+            title = task.title,
+            description = task.description,
+            id = task.id,
+            state = !task.state,
+            alarmState = task.alarmState
+        )
+        viewModelScope.launch {
+            taskUseCases.addTask.invoke(newItem)
+        }
+    }
 }
