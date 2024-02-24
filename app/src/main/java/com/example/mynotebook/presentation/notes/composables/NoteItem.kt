@@ -35,7 +35,7 @@ fun NotesItem(
             Text(
                 text = content,
                 maxLines = 6,
-                style = Typography.bodySmall
+                style = Typography.bodyMedium
             )
         }
     }

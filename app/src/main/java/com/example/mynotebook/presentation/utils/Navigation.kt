@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.mynotebook.presentation.main.MainScreen
 import com.example.mynotebook.presentation.add_edit_notes.AddEditNoteScreen
+import com.example.mynotebook.presentation.add_edit_task.AddEditTaskScreen
 
 @Composable
 fun Navigation(navController: NavController){
@@ -29,6 +30,9 @@ fun Navigation(navController: NavController){
             )
         ){
             AddEditNoteScreen(navController = navController)
+        }
+        composable(route = Screens.AddEditTaskScreen.route){
+            AddEditTaskScreen(navController = navController)
         }
     }
 }

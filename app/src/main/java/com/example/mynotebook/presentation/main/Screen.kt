@@ -9,6 +9,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -33,8 +34,6 @@ import com.example.mynotebook.presentation.utils.Screens
 import com.example.mynotebook.presentation.utils.TabItem.Calendar
 import com.example.mynotebook.presentation.utils.TabItem.Notes
 import com.example.mynotebook.presentation.utils.TabItem.Tasks
-import com.example.mynotebook.ui.theme.onSelect
-import com.example.mynotebook.ui.theme.terciary
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -91,7 +90,7 @@ fun MainScreen(
                     text = stringResource(id = R.string.app_name),
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
-                    color = onSelect
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
             TabRow(selectedTabIndex = selectedTabIndex) {
@@ -104,7 +103,7 @@ fun MainScreen(
                             Text(
                                 text = stringResource(id = item.title),
                                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                                color = if (isSelected) onSelect else terciary
+                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary
                             )
                         }
                     )
@@ -114,7 +113,8 @@ fun MainScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                state = pagerState
+                state = pagerState,
+                beyondBoundsPageCount = 2
             ) {
                 Box(
                     modifier = Modifier
@@ -131,7 +131,7 @@ fun MainScreen(
                         1 -> {
                             TaskScreen(navController = navController)
                             buttonContent = ButtonState.TaskScreen(navigateToTask = {
-
+                                navController.navigate(Screens.AddEditTaskScreen.route)
                             })
                         }
 
