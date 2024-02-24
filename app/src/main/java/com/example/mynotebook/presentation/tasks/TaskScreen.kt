@@ -19,23 +19,28 @@ import kotlin.concurrent.timerTask
 fun TaskScreen(
     viewModel: TaskScreenViewModel = hiltViewModel(),
     navController: NavController
-){
+) {
     val taskList = viewModel.taskList.value
 
+    LaunchedEffect(viewModel) {
+        viewModel.getTasks()
+    }
 
     Scaffold {
         LazyColumn(
             modifier = Modifier
                 .padding(it)
                 .fillMaxSize()
-        ){
-            items(taskList){task ->
+        ) {
+            items(taskList) { task ->
                 TaskItem(
                     title = task.title,
                     state = task.state,
                     id = task.id ?: -1,
+                    hour = "10:00am",
+                    onCheckedChange = { /*TODO*/ },
                     modifier = Modifier
-                        .clickable {  })
+                        .clickable { })
             }
         }
     }

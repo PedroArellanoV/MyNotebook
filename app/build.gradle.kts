@@ -93,4 +93,5 @@ dependencies {
     //Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.hilt:hilt-navigation-fragment:1.2.0")
+    implementation("com.google.code.gson:gson:2.10")
 }

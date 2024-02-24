@@ -62,7 +62,8 @@ object AppModule {
             app,
             TaskDatabase::class.java,
             TaskDatabase.TASK_DATABASE_NAME
-        ).build()
+        )
+            .build()
     }
 
     @Provides

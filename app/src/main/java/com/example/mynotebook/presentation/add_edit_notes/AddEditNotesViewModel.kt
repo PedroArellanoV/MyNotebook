@@ -5,9 +5,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mynotebook.domain.notes.model.InvalidNoteException
 import com.example.mynotebook.domain.notes.model.NoteModel
 import com.example.mynotebook.domain.notes.use_cases.NoteUseCases
+import com.example.mynotebook.presentation.utils.InvalidCallException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -28,7 +28,7 @@ class AddEditNotesViewModel @Inject constructor(
     private val _noteFavState = mutableStateOf(false)
     val noteFavState: State<Boolean> = _noteFavState
 
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
+    private val _eventFlow = MutableSharedFlow<NotesUiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
     private var currentNoteId: Int? = null
@@ -55,7 +55,7 @@ class AddEditNotesViewModel @Inject constructor(
         _noteContent.value = newContent
     }
 
-    fun onFavStateChanged(newState: Boolean){
+    fun onFavStateChanged(newState: Boolean) {
         _noteFavState.value = newState
     }
 
@@ -69,10 +69,10 @@ class AddEditNotesViewModel @Inject constructor(
                         id = currentNoteId
                     )
                 )
-                _eventFlow.emit(UiEvent.SaveNote)
-            } catch (e: InvalidNoteException) {
+                _eventFlow.emit(NotesUiEvent.SaveNote)
+            } catch (e: InvalidCallException) {
                 _eventFlow.emit(
-                    UiEvent.ShowSnackbar(
+                    NotesUiEvent.ShowSnackbar(
                         e.message ?: "Couldn't save note"
                     )
                 )
@@ -81,7 +81,7 @@ class AddEditNotesViewModel @Inject constructor(
     }
 
 
-    fun onDeleteNote(){
+    fun onDeleteNote() {
         viewModelScope.launch {
             noteUseCases.deleteNote(
                 NoteModel(
@@ -93,8 +93,8 @@ class AddEditNotesViewModel @Inject constructor(
         }
     }
 
-    sealed class UiEvent {
-        data class ShowSnackbar(val message: String) : UiEvent()
-        data object SaveNote : UiEvent()
+    sealed class NotesUiEvent {
+        data class ShowSnackbar(val message: String) : NotesUiEvent()
+        data object SaveNote : NotesUiEvent()
     }
 }

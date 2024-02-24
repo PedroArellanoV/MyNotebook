@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -12,17 +13,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedIconToggleButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -30,9 +34,11 @@ import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +49,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.mynotebook.R
 import com.example.mynotebook.ui.theme.Typography
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,11 +62,40 @@ fun AddEditTaskScreen(
 
     val taskTitle = viewModel.taskTitle.value
     val taskState = viewModel.taskState.value
+    val taskAlarm = viewModel.alarmState.value
 
     var showTimePicker by remember { mutableStateOf(false) }
     val timePickerState = rememberTimePickerState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is AddEditTaskViewModel.TaskUiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(
+                        message = event.message
+                    )
+                }
+
+                is AddEditTaskViewModel.TaskUiEvent.SaveTask -> {
+                    navController.navigateUp()
+                }
+            }
+        }
+    }
 
     Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    viewModel.onSaveTask()
+                }
+            ) {
+                Icon(imageVector = Icons.Default.Check, contentDescription = "Save")
+            }
+        },
         topBar = {
             TopAppBar(
                 title = {
@@ -104,6 +142,38 @@ fun AddEditTaskScreen(
                 label = { Text(text = "Task name") },
                 maxLines = 1
             )
+            if(taskAlarm.isActive){
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    OutlinedIconToggleButton( checked = false, onCheckedChange = {}) {
+                        Text(text = "M")
+                    }
+                    OutlinedIconToggleButton( checked = false, onCheckedChange = {} ) {
+                        Text(text = "T")
+                    }
+                    OutlinedIconToggleButton( checked = false, onCheckedChange = {} ) {
+                        Text(text = "W")
+                    }
+                    OutlinedIconToggleButton( checked = true, onCheckedChange = {} ) {
+                        Text(text = "Th")
+                    }
+                    OutlinedIconToggleButton( checked = true, onCheckedChange = {} ) {
+                        Text(text = "F")
+                    }
+                    OutlinedIconToggleButton( checked = false, onCheckedChange = {} ) {
+                        Text(text = "S")
+                    }
+                    OutlinedIconToggleButton( checked = false, onCheckedChange = {} ) {
+                        Text(text = "Su")
+                    }
+
+                }
+            }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -120,7 +190,7 @@ fun AddEditTaskScreen(
                     )
                 }
                 Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                AssistChip(
+                FilterChip(
                     onClick = { showTimePicker = true },
                     label = { Text("Alarm") },
                     leadingIcon = {
@@ -129,7 +199,9 @@ fun AddEditTaskScreen(
                             contentDescription = "Add alarm",
                             Modifier.size(AssistChipDefaults.IconSize)
                         )
-                    }
+                    },
+                    enabled = taskTitle.isNotEmpty(),
+                    selected = taskAlarm.isActive
                 )
             }
 
@@ -160,7 +232,15 @@ fun AddEditTaskScreen(
                                     color = MaterialTheme.colorScheme.secondary
                                 )
                             }
-                            TextButton(onClick = { showTimePicker = false }) {
+                            TextButton(onClick = {
+                                showTimePicker = false
+                                scope.launch(Dispatchers.IO) {
+                                    viewModel.addAlarmToTask(
+                                        timePickerState.hour,
+                                        timePickerState.minute
+                                    )
+                                }
+                            }) {
                                 Text(
                                     text = "Ok",
                                     color = MaterialTheme.colorScheme.secondary
