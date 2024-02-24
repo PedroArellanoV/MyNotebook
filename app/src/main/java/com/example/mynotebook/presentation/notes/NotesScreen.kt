@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.mynotebook.domain.notes.model.NoteModel
 import com.example.mynotebook.presentation.notes.composables.NotesItem
 import com.example.mynotebook.presentation.utils.Screens
 
@@ -31,7 +32,7 @@ fun NotesScreen(
     LaunchedEffect(viewModel){
         viewModel.getNotes()
     }
-    
+
     Scaffold {
         LazyVerticalGrid(
             modifier = Modifier

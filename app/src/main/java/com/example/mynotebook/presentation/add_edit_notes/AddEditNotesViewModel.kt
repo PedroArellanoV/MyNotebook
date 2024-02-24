@@ -25,6 +25,9 @@ class AddEditNotesViewModel @Inject constructor(
     private val _noteContent = mutableStateOf("")
     val noteContent: State<String> = _noteContent
 
+    private val _noteFavState = mutableStateOf(false)
+    val noteFavState: State<Boolean> = _noteFavState
+
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
@@ -50,6 +53,10 @@ class AddEditNotesViewModel @Inject constructor(
 
     fun onContentChanged(newContent: String) {
         _noteContent.value = newContent
+    }
+
+    fun onFavStateChanged(newState: Boolean){
+        _noteFavState.value = newState
     }
 
     fun onSaveNote() {

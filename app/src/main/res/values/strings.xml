@@ -10,4 +10,9 @@
     <!-- Add edit screen-->
     <string name="title_hint">Title</string>
     <string name="content_hint">Write here…</string>
+    <string name="edit_note">Edit note</string>
+    <string name="edit_task">Edit task</string>
+    <string name="set_reminder">Set Reminder</string>
+    <string name="note_title">Title</string>
+    <string name="note_content">Note</string>
 </resources>

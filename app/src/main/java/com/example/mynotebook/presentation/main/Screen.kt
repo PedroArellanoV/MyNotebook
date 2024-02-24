@@ -1,5 +1,6 @@
 package com.example.mynotebook.presentation.main
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,12 +21,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.mynotebook.R
 import com.example.mynotebook.presentation.notes.NotesScreen
@@ -35,15 +38,14 @@ import com.example.mynotebook.presentation.utils.TabItem.Calendar
 import com.example.mynotebook.presentation.utils.TabItem.Notes
 import com.example.mynotebook.presentation.utils.TabItem.Tasks
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MainScreen(
     navController: NavController
 ) {
 
-    var selectedTabIndex by remember {
-        mutableIntStateOf(0)
-    }
+    var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     val tabItems = listOf(Notes, Tasks, Calendar)
     var buttonContent by remember {
         mutableStateOf<ButtonState>(
@@ -52,15 +54,9 @@ fun MainScreen(
             )
         )
     }
-    val pagerState = rememberPagerState {
-        tabItems.size
-    }
+    val pagerState = rememberPagerState { tabItems.size }
 
-
-
-    LaunchedEffect(selectedTabIndex) {
-        pagerState.animateScrollToPage(selectedTabIndex)
-    }
+    LaunchedEffect(selectedTabIndex) { pagerState.animateScrollToPage(selectedTabIndex) }
     LaunchedEffect(pagerState.currentPage, pagerState.isScrollInProgress) {
         if (!pagerState.isScrollInProgress) {
             selectedTabIndex = pagerState.currentPage
@@ -76,7 +72,7 @@ fun MainScreen(
                 )
             }
         }
-    ) { padding ->
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -113,32 +109,31 @@ fun MainScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                state = pagerState,
-                beyondBoundsPageCount = 2
-            ) {
-                Box(
-                    modifier = Modifier
-                        .padding(padding)
-                ) {
-                    when (selectedTabIndex) {
-                        0 -> {
-                            NotesScreen(navController = navController)
-                            buttonContent = ButtonState.NotesScreen(navigateToNotes = {
-                                navController.navigate(Screens.AddEditNotesScreen.route)
-                            })
-                        }
+                state = pagerState
+            ) { page ->
+                when (page) {
+                    0 -> {
+                        NotesScreen(
+                            navController = navController
+                        )
+                        buttonContent = ButtonState.NotesScreen(navigateToNotes = {
+                            navController.navigate(Screens.AddEditNotesScreen.route)
+                        })
+                    }
 
-                        1 -> {
-                            TaskScreen(navController = navController)
-                            buttonContent = ButtonState.TaskScreen(navigateToTask = {
-                                navController.navigate(Screens.AddEditTaskScreen.route)
-                            })
-                        }
+                    1 -> {
+                        TaskScreen(
+                            navController = navController
+                        )
+                        buttonContent = ButtonState.TaskScreen(navigateToTask = {
+                            navController.navigate(Screens.AddEditTaskScreen.route)
+                        })
+                    }
 
-                        2 -> {
-                        }
+                    2 -> {
                     }
                 }
+
             }
         }
     }

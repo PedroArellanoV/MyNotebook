@@ -11,7 +11,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.mynotebook.domain.task.model.TaskModel
 import com.example.mynotebook.presentation.tasks.composables.TaskItem
+import kotlin.concurrent.timerTask
 
 @Composable
 fun TaskScreen(
@@ -20,9 +22,6 @@ fun TaskScreen(
 ){
     val taskList = viewModel.taskList.value
 
-    LaunchedEffect(viewModel){
-        viewModel.getTasks()
-    }
 
     Scaffold {
         LazyColumn(
