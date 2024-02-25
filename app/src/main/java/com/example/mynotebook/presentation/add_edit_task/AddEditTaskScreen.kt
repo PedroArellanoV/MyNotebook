@@ -1,6 +1,5 @@
 package com.example.mynotebook.presentation.add_edit_task
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,33 +9,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedIconToggleButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -55,12 +49,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.mynotebook.R
-import com.example.mynotebook.domain.task.model.TaskModel
-import com.example.mynotebook.presentation.add_edit_task.utils.DayOfWeek
+import com.example.mynotebook.presentation.add_edit_task.composables.AddAlarmSheet
 import com.example.mynotebook.ui.theme.Typography
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 
 /*
@@ -85,13 +76,14 @@ fun AddEditTaskScreen(
     val taskTitle = viewModel.taskTitle.value
     val taskDescription = viewModel.taskDescription.value
     val taskState = viewModel.taskState.value
-    val taskAlarm = viewModel.alarmState.value
-
+    val alarmState = viewModel.alarmState.value
+    val typeOfAlarm = viewModel.typeOfAlarm.value
     val selectedDays = viewModel.selectedDays.value
 
     var showTimePicker by remember { mutableStateOf(false) }
     val timePickerState = rememberTimePickerState()
     val snackbarHostState = remember { SnackbarHostState() }
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
@@ -193,7 +185,7 @@ fun AddEditTaskScreen(
                     onClick = {
                         viewModel.onDeleteTask()
                         navController.navigateUp()
-                }) {
+                    }) {
                     Row(
                         modifier = Modifier.padding(4.dp)
                     ) {
@@ -208,7 +200,7 @@ fun AddEditTaskScreen(
 
                 }
             }
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
             Row(
@@ -216,39 +208,14 @@ fun AddEditTaskScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End
             ) {
-                if (taskAlarm.isActive) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 8.dp)
-                        ) {
-                            DayOfWeek.entries.forEach { day ->
-                                OutlinedIconToggleButton(
-                                    onCheckedChange = { viewModel.toggleDaySelection(day) },
-                                    checked = selectedDays.contains(day)
-                                ) {
-                                    Text(day.abbreviation)
-                                }
-                            }
-                        }
-
-                    }
-                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
                     FilterChip(
-                        onClick = { showTimePicker = true },
+                        onClick = { showBottomSheet = true },
                         label = { Text("Alarm") },
                         leadingIcon = {
                             Icon(
@@ -258,56 +225,32 @@ fun AddEditTaskScreen(
                             )
                         },
                         enabled = taskTitle.isNotEmpty(),
-                        selected = taskAlarm.isActive
+                        selected = alarmState.isActive
                     )
                 }
-
-                if (showTimePicker) {
-
-                    AlertDialog(
-                        onDismissRequest = { showTimePicker = false },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .background(
-                                    color = MaterialTheme.colorScheme.onSecondary,
-                                    shape = RoundedCornerShape(20.dp)
-                                )
-                                .padding(20.dp),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            TimePicker(state = timePickerState)
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                TextButton(onClick = { showTimePicker = false }) {
-                                    Text(
-                                        text = "Cancel", color = MaterialTheme.colorScheme.secondary
-                                    )
-                                }
-                                TextButton(onClick = {
-                                    showTimePicker = false
-                                    scope.launch(Dispatchers.IO) {
-                                        viewModel.addAlarmToTask(
-                                            timePickerState.hour, timePickerState.minute
-                                        )
-                                    }
-                                }) {
-                                    Text(
-                                        text = "Ok", color = MaterialTheme.colorScheme.secondary
-                                    )
-                                }
-                            }
-                        }
-
-
-                    }
-                }
-
             }
+
+            if (showBottomSheet) {
+                ModalBottomSheet(onDismissRequest = { showBottomSheet = false }) {
+                    AddAlarmSheet(
+                        isAlarmActive = alarmState.isActive,
+                        onAlarmStateSwitch = { active -> viewModel.toggledAlarmSwitch(active) },
+                        selectedType = typeOfAlarm,
+                        onTypeChange = { state -> viewModel.onAlarmTypeChange(state) },
+                        toggleDaySelection = { day -> viewModel.toggleDaySelection(day) },
+                        selectedDays = selectedDays,
+                        timePickerState = timePickerState,
+                        onSaveAlarm = {
+                            if(typeOfAlarm.index == 0){
+                                viewModel.onDailyAlarmSave(timePickerState)
+                            }
+                            showBottomSheet = false
+                        },
+                        onDismissRequest = { showBottomSheet = false }
+                    )
+                }
+            }
+
         }
     }
 }

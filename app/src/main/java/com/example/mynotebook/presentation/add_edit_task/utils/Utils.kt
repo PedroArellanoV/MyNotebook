@@ -10,3 +10,8 @@ enum class DayOfWeek(val abbreviation: String) {
     SAT("S"),
     SUN("Su")
 }
+
+enum class Options(val options: String, val index: Int){
+    DAILY("Daily", 0),
+    CALENDAR("Calendar", 1)
+}

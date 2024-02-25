@@ -1,22 +1,28 @@
 package com.example.mynotebook.presentation.add_edit_task
 
+import android.util.Log
+import androidx.compose.material3.DatePickerState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mynotebook.domain.task.model.TaskModel
-import com.example.mynotebook.domain.task.use_cases.DeleteTask
 import com.example.mynotebook.domain.task.use_cases.TaskUseCases
 import com.example.mynotebook.domain.task.utils.AlarmState
 import com.example.mynotebook.presentation.add_edit_task.utils.DayOfWeek
+import com.example.mynotebook.presentation.add_edit_task.utils.Options
 import com.example.mynotebook.presentation.utils.InvalidCallException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
+@OptIn(ExperimentalMaterial3Api::class)
 @HiltViewModel
 class AddEditTaskViewModel @Inject constructor(
     private val taskUseCases: TaskUseCases,
@@ -32,6 +38,8 @@ class AddEditTaskViewModel @Inject constructor(
     private val _taskState = mutableStateOf(false)
     val taskState: State<Boolean> = _taskState
 
+    private val _typeOfAlarm = mutableStateOf(Options.DAILY)
+    val typeOfAlarm: State<Options> = _typeOfAlarm
 
     private val _selectedDays = mutableStateOf<List<DayOfWeek>>(emptyList())
     val selectedDays: State<List<DayOfWeek>> = _selectedDays
@@ -44,7 +52,7 @@ class AddEditTaskViewModel @Inject constructor(
     private val _alarmState = mutableStateOf(
         AlarmState(
             isActive = false,
-            time = null
+            typeOfAlarm = null
         )
     )
     val alarmState: State<AlarmState> = _alarmState
@@ -78,15 +86,19 @@ class AddEditTaskViewModel @Inject constructor(
         _taskState.value = newState
     }
 
-    fun addAlarmToTask(hour: Int, minute: Int) {
-        _alarmState.value = AlarmState(
-            isActive = true,
-            time = "$hour, $minute"
-        )
+    fun onAlarmTypeChange(index: Int) {
+        when (index) {
+            0 -> _typeOfAlarm.value = Options.DAILY
+            1 -> _typeOfAlarm.value = Options.CALENDAR
+        }
     }
 
-    fun onAlarmChanged(newState: Boolean){
+    fun toggledAlarmSwitch(newState: Boolean) {
         _alarmState.value.isActive = newState
+    }
+
+    fun onTypeOfAlarmSelected(type: AlarmState.Alarm) {
+        _alarmState.value.typeOfAlarm = type
     }
 
     fun onSaveTask() {
@@ -111,7 +123,7 @@ class AddEditTaskViewModel @Inject constructor(
         }
     }
 
-    fun onDeleteTask(){
+    fun onDeleteTask() {
         viewModelScope.launch {
             taskUseCases.deleteTask(
                 TaskModel(
@@ -123,6 +135,23 @@ class AddEditTaskViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    fun onDailyAlarmSave(
+        timePickerState: TimePickerState
+    ) {
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+        cal.set(Calendar.MINUTE, timePickerState.minute)
+        cal.isLenient = false
+
+
+        _alarmState.value.typeOfAlarm = AlarmState.Alarm.DailyAlarm(
+            selectedDays = selectedDays.value,
+            hour = timePickerState.hour,
+            minute = timePickerState.minute,
+        )
+        Log.d("alarm_saved", "${timePickerState.hour}:${timePickerState.minute}hs")
     }
 
     fun toggleDaySelection(day: DayOfWeek) {
