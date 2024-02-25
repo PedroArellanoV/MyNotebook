@@ -73,7 +73,7 @@ fun AddEditNoteScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.edit_note),
-                        style = Typography.displaySmall,
+                        style = Typography.titleLarge,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold
                     )
@@ -125,7 +125,7 @@ fun AddEditNoteScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
-                textStyle = MaterialTheme.typography.headlineSmall,
+                textStyle = MaterialTheme.typography.titleLarge,
                 label = { Text(text = stringResource(id = R.string.note_title)) },
                 maxLines = 1
             )

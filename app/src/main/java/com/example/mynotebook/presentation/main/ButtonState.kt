@@ -27,12 +27,4 @@ sealed class ButtonState(
         contentDescription = "Add task",
         onClickEvent = navigateToTask
     )
-
-    data class CalendarScreen(
-        val navigateToCalendar: ()-> Unit
-    ) : ButtonState(
-        imageVector = Icons.Default.Flag,
-        contentDescription = "Add Note",
-        onClickEvent = navigateToCalendar
-    )
 }

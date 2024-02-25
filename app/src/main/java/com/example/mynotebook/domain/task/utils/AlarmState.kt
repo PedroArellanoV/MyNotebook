@@ -1,6 +1,6 @@
 package com.example.mynotebook.domain.task.utils
 
 data class AlarmState(
-    val isActive: Boolean,
+    var isActive: Boolean,
     val time: String?
 )

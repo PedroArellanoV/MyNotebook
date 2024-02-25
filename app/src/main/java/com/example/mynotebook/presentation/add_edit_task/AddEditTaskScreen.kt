@@ -5,11 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
@@ -19,6 +19,10 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
@@ -44,28 +48,46 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.mynotebook.R
+import com.example.mynotebook.domain.task.model.TaskModel
+import com.example.mynotebook.presentation.add_edit_task.utils.DayOfWeek
 import com.example.mynotebook.ui.theme.Typography
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
+
+/*
+TODO:
+ Crear un Alert Dialog para la navegación hacia arriba.
+ Si el usuario hizo cambios en los datos, antes de volver atrás
+ avisar que puede puerder los cambios.
+ Crear funcionalidad a la hora de seleccionar la alarma
+ y trabajar con los datos(Crear una notificación diaria/semanal/mensual)
+ para que el usuario reciba un recordatorio.
+ */
+
+
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditTaskScreen(
-    navController: NavController,
-    viewModel: AddEditTaskViewModel = hiltViewModel()
+    navController: NavController, viewModel: AddEditTaskViewModel = hiltViewModel()
 ) {
 
     val taskTitle = viewModel.taskTitle.value
     val taskDescription = viewModel.taskDescription.value
     val taskState = viewModel.taskState.value
     val taskAlarm = viewModel.alarmState.value
+
+    val selectedDays = viewModel.selectedDays.value
 
     var showTimePicker by remember { mutableStateOf(false) }
     val timePickerState = rememberTimePickerState()
@@ -89,66 +111,52 @@ fun AddEditTaskScreen(
         }
     }
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    viewModel.onSaveTask()
-                }
-            ) {
-                Icon(imageVector = Icons.Default.Check, contentDescription = "Save")
+    Scaffold(floatingActionButton = {
+        FloatingActionButton(onClick = {
+            viewModel.onSaveTask()
+        }) {
+            Icon(imageVector = Icons.Default.Check, contentDescription = "Save")
+        }
+    }, topBar = {
+        TopAppBar(title = {
+            Text(
+                text = stringResource(id = R.string.app_name),
+                style = Typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold
+            )
+        }, navigationIcon = {
+            IconButton(onClick = { navController.navigateUp() }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBackIosNew, contentDescription = "Back"
+                )
             }
-        },
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.app_name),
-                        style = Typography.displaySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold
-                    )
+        }, actions = {
+            Switch(modifier = Modifier.padding(8.dp),
+                checked = taskState,
+                onCheckedChange = { state ->
+                    viewModel.onStateChanged(state)
                 },
-                navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
+                thumbContent = {
+                    if (taskState) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBackIosNew,
-                            contentDescription = "Back"
+                            modifier = Modifier.size(18.dp, 18.dp),
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null
+                        )
+                    } else {
+                        Icon(
+                            modifier = Modifier.size(18.dp, 18.dp),
+                            imageVector = Icons.Default.Close,
+                            contentDescription = null
                         )
                     }
-                },
-                actions = {
-                    Switch(
-                        modifier = Modifier
-                            .padding(8.dp),
-                        checked = taskState,
-                        onCheckedChange = { state ->
-                            viewModel.onStateChanged(state)
-                        },
-                        thumbContent = {
-                            if (taskState) {
-                                Icon(
-                                    modifier = Modifier.size(18.dp, 18.dp),
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = null
-                                )
-                            } else {
-                                Icon(
-                                    modifier = Modifier.size(18.dp, 18.dp),
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = null
-                                )
-                            }
 
-                        }
-                    )
-                }
-            )
-        }
-    ) {
+                })
+        })
+    }) {
         Column(
-            modifier = Modifier
-                .padding(it)
+            modifier = Modifier.padding(it)
         ) {
             OutlinedTextField(
                 value = taskTitle,
@@ -173,117 +181,133 @@ fun AddEditTaskScreen(
                 minLines = 5,
                 maxLines = 5
             )
-            if(taskAlarm.isActive){
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Card(
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color.Transparent
+                    ),
+                    onClick = {
+                        viewModel.onDeleteTask()
+                        navController.navigateUp()
+                }) {
+                    Row(
+                        modifier = Modifier.padding(4.dp)
+                    ) {
+                        Text(text = "Delete task")
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            modifier = Modifier.sizeIn(maxWidth = 30.dp, maxHeight = 30.dp),
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete"
+                        )
+                    }
+
+                }
+            }
+            Divider(
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
+            ) {
+                if (taskAlarm.isActive) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            DayOfWeek.entries.forEach { day ->
+                                OutlinedIconToggleButton(
+                                    onCheckedChange = { viewModel.toggleDaySelection(day) },
+                                    checked = selectedDays.contains(day)
+                                ) {
+                                    Text(day.abbreviation)
+                                }
+                            }
+                        }
+
+                    }
+                }
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    OutlinedIconToggleButton( checked = false, onCheckedChange = {}) {
-                        Text(text = "M")
-                    }
-                    OutlinedIconToggleButton( checked = false, onCheckedChange = {} ) {
-                        Text(text = "T")
-                    }
-                    OutlinedIconToggleButton( checked = false, onCheckedChange = {} ) {
-                        Text(text = "W")
-                    }
-                    OutlinedIconToggleButton( checked = true, onCheckedChange = {} ) {
-                        Text(text = "Th")
-                    }
-                    OutlinedIconToggleButton( checked = true, onCheckedChange = {} ) {
-                        Text(text = "F")
-                    }
-                    OutlinedIconToggleButton( checked = false, onCheckedChange = {} ) {
-                        Text(text = "S")
-                    }
-                    OutlinedIconToggleButton( checked = false, onCheckedChange = {} ) {
-                        Text(text = "Su")
-                    }
-
-                }
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                IconButton(onClick = {
-                    navController.navigateUp()
-                }) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete"
+                        .padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                    Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                    FilterChip(
+                        onClick = { showTimePicker = true },
+                        label = { Text("Alarm") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Alarm,
+                                contentDescription = "Add alarm",
+                                Modifier.size(AssistChipDefaults.IconSize)
+                            )
+                        },
+                        enabled = taskTitle.isNotEmpty(),
+                        selected = taskAlarm.isActive
                     )
                 }
-                Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                FilterChip(
-                    onClick = { showTimePicker = true },
-                    label = { Text("Alarm") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Alarm,
-                            contentDescription = "Add alarm",
-                            Modifier.size(AssistChipDefaults.IconSize)
-                        )
-                    },
-                    enabled = taskTitle.isNotEmpty(),
-                    selected = taskAlarm.isActive
-                )
-            }
 
-            if (showTimePicker) {
+                if (showTimePicker) {
 
-                AlertDialog(
-                    onDismissRequest = { showTimePicker = false },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .background(
-                                color = MaterialTheme.colorScheme.onSecondary,
-                                shape = RoundedCornerShape(20.dp)
-                            )
-                            .padding(20.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    AlertDialog(
+                        onDismissRequest = { showTimePicker = false },
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        TimePicker(state = timePickerState)
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
-                        ) {
-                            TextButton(onClick = { showTimePicker = false }) {
-                                Text(
-                                    text = "Cancel",
-                                    color = MaterialTheme.colorScheme.secondary
+                        Column(
+                            modifier = Modifier
+                                .background(
+                                    color = MaterialTheme.colorScheme.onSecondary,
+                                    shape = RoundedCornerShape(20.dp)
                                 )
-                            }
-                            TextButton(onClick = {
-                                showTimePicker = false
-                                scope.launch(Dispatchers.IO) {
-                                    viewModel.addAlarmToTask(
-                                        timePickerState.hour,
-                                        timePickerState.minute
+                                .padding(20.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            TimePicker(state = timePickerState)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                TextButton(onClick = { showTimePicker = false }) {
+                                    Text(
+                                        text = "Cancel", color = MaterialTheme.colorScheme.secondary
                                     )
                                 }
-                            }) {
-                                Text(
-                                    text = "Ok",
-                                    color = MaterialTheme.colorScheme.secondary
-                                )
+                                TextButton(onClick = {
+                                    showTimePicker = false
+                                    scope.launch(Dispatchers.IO) {
+                                        viewModel.addAlarmToTask(
+                                            timePickerState.hour, timePickerState.minute
+                                        )
+                                    }
+                                }) {
+                                    Text(
+                                        text = "Ok", color = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
                             }
                         }
+
+
                     }
-
-
                 }
-            }
 
+            }
         }
     }
 }

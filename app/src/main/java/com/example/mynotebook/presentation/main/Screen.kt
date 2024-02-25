@@ -46,7 +46,7 @@ fun MainScreen(
 ) {
 
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
-    val tabItems = listOf(Notes, Tasks, Calendar)
+    val tabItems = listOf(Notes, Tasks)
     var buttonContent by remember {
         mutableStateOf<ButtonState>(
             ButtonState.NotesScreen(
@@ -128,9 +128,6 @@ fun MainScreen(
                         buttonContent = ButtonState.TaskScreen(navigateToTask = {
                             navController.navigate(Screens.AddEditTaskScreen.route)
                         })
-                    }
-
-                    2 -> {
                     }
                 }
 

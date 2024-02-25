@@ -20,7 +20,7 @@ class NotesViewModel @Inject constructor(
     fun getNotes(){
         viewModelScope.launch {
             noteUseCases.getNotes.invoke().collect {
-                _noteList.value = it
+                _noteList.value = it.sortedByDescending { note -> note.isFav }
             }
 
         }
