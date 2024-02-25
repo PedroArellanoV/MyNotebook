@@ -109,7 +109,8 @@ class AddEditTaskViewModel @Inject constructor(
                         title = taskTitle.value,
                         description = taskDescription.value,
                         state = taskState.value,
-                        alarmState = alarmState.value
+                        alarmState = alarmState.value,
+                        id = currentTaskId
                     )
                 )
                 _eventFlow.emit(TaskUiEvent.SaveTask)

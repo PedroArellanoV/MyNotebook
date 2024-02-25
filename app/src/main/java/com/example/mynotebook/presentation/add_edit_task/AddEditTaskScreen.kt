@@ -38,7 +38,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -80,12 +79,9 @@ fun AddEditTaskScreen(
     val typeOfAlarm = viewModel.typeOfAlarm.value
     val selectedDays = viewModel.selectedDays.value
 
-    var showTimePicker by remember { mutableStateOf(false) }
     val timePickerState = rememberTimePickerState()
     val snackbarHostState = remember { SnackbarHostState() }
     var showBottomSheet by remember { mutableStateOf(false) }
-
-    val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -241,7 +237,7 @@ fun AddEditTaskScreen(
                         selectedDays = selectedDays,
                         timePickerState = timePickerState,
                         onSaveAlarm = {
-                            if(typeOfAlarm.index == 0){
+                            if (typeOfAlarm.index == 0) {
                                 viewModel.onDailyAlarmSave(timePickerState)
                             }
                             showBottomSheet = false
