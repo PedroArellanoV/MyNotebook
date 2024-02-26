@@ -1,15 +1,23 @@
 package com.example.mynotebook.domain.task.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import com.example.mynotebook.data.data_source.model.TaskEntity
 import com.example.mynotebook.domain.task.utils.AlarmState
+import com.google.gson.Gson
 
-@Entity(tableName = "task_model")
 data class TaskModel(
     val title: String,
     val description: String,
     val state: Boolean = false,
     val alarmState: AlarmState,
-    @PrimaryKey val id: Int? = null
+    val id: Int? = null
 )
 
+fun TaskModel.toTaskEntity(): TaskEntity {
+    return TaskEntity(
+        title = title,
+        description = description,
+        state = state,
+        alarmState = Gson().toJson(alarmState),
+        id = id
+    )
+}

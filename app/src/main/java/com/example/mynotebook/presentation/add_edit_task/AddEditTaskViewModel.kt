@@ -1,7 +1,6 @@
 package com.example.mynotebook.presentation.add_edit_task
 
 import android.util.Log
-import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.State
@@ -10,8 +9,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mynotebook.domain.task.model.TaskModel
+import com.example.mynotebook.domain.task.model.toTaskEntity
 import com.example.mynotebook.domain.task.use_cases.TaskUseCases
 import com.example.mynotebook.domain.task.utils.AlarmState
+import com.example.mynotebook.domain.task.utils.DailyAlarm
 import com.example.mynotebook.presentation.add_edit_task.utils.DayOfWeek
 import com.example.mynotebook.presentation.add_edit_task.utils.Options
 import com.example.mynotebook.presentation.utils.InvalidCallException
@@ -52,7 +53,8 @@ class AddEditTaskViewModel @Inject constructor(
     private val _alarmState = mutableStateOf(
         AlarmState(
             isActive = false,
-            typeOfAlarm = null
+            dailyAlarm = null,
+            calendarAlarm = null
         )
     )
     val alarmState: State<AlarmState> = _alarmState
@@ -97,10 +99,6 @@ class AddEditTaskViewModel @Inject constructor(
         _alarmState.value.isActive = newState
     }
 
-    fun onTypeOfAlarmSelected(type: AlarmState.Alarm) {
-        _alarmState.value.typeOfAlarm = type
-    }
-
     fun onSaveTask() {
         viewModelScope.launch {
             try {
@@ -111,7 +109,7 @@ class AddEditTaskViewModel @Inject constructor(
                         state = taskState.value,
                         alarmState = alarmState.value,
                         id = currentTaskId
-                    )
+                    ).toTaskEntity()
                 )
                 _eventFlow.emit(TaskUiEvent.SaveTask)
             } catch (e: InvalidCallException) {
@@ -133,7 +131,7 @@ class AddEditTaskViewModel @Inject constructor(
                     taskState.value,
                     alarmState.value,
                     currentTaskId
-                )
+                ).toTaskEntity()
             )
         }
     }
@@ -147,12 +145,18 @@ class AddEditTaskViewModel @Inject constructor(
         cal.isLenient = false
 
 
-        _alarmState.value.typeOfAlarm = AlarmState.Alarm.DailyAlarm(
-            selectedDays = selectedDays.value,
+        _alarmState.value.dailyAlarm = DailyAlarm(
+            selectedDays = selectedDays.value.map { day ->
+                com.example.mynotebook.domain.task.utils.DayOfWeek(day.abbreviation, true)
+            },
             hour = timePickerState.hour,
             minute = timePickerState.minute,
         )
         Log.d("alarm_saved", "${timePickerState.hour}:${timePickerState.minute}hs")
+    }
+
+    fun getDaySelection(){
+
     }
 
     fun toggleDaySelection(day: DayOfWeek) {

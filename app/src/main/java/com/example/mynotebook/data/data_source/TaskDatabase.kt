@@ -2,14 +2,12 @@ package com.example.mynotebook.data.data_source
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
-import com.example.mynotebook.domain.task.model.TaskModel
+import com.example.mynotebook.data.data_source.model.TaskEntity
 
 @Database(
-    entities = [TaskModel::class],
+    entities = [TaskEntity::class],
     version = 2
 )
-@TypeConverters(Convertes::class)
 abstract class TaskDatabase : RoomDatabase() {
     abstract val taskDao: TaskDao
 

@@ -1,6 +1,8 @@
 package com.example.mynotebook.presentation.tasks.composables
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,63 +32,69 @@ fun TaskItem(
     state: Boolean,
     hour: String,
     modifier: Modifier,
-    onCheckedChange: () -> Unit
+    onCheckedChange: () -> Unit,
+    onCardClicked:() -> Unit
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 8.dp)
-            .height(60.dp)
-    ) {
-        Row(
+    Box(modifier = modifier){
+        Card(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth()
+                .height(60.dp)
+                .clickable {
+                    onCardClicked()
+                }
         ) {
-            Text(
-                text = title,
-                style = Typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                maxLines = 1,
-                modifier = Modifier.widthIn(max = 150.dp)
-            )
             Row(
-                modifier = Modifier.padding(horizontal = 4.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = hour,
+                    text = title,
                     style = Typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    maxLines = 1
+                    maxLines = 1,
+                    modifier = Modifier.widthIn(max = 150.dp)
                 )
-                Spacer(
-                    modifier = Modifier.width(4.dp)
-                )
-                Switch(
-                    checked = state,
-                    onCheckedChange = { onCheckedChange() },
-                    thumbContent = {
-                        if (state) {
-                            Icon(
-                                modifier = Modifier.size(18.dp, 18.dp),
-                                imageVector = Icons.Default.Check,
-                                contentDescription = null
-                            )
-                        } else {
-                            Icon(
-                                modifier = Modifier.size(18.dp, 18.dp),
-                                imageVector = Icons.Default.Close,
-                                contentDescription = null
-                            )
+                Row(
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = hour,
+                        style = Typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 1
+                    )
+                    Spacer(
+                        modifier = Modifier.width(4.dp)
+                    )
+                    Switch(
+                        checked = state,
+                        onCheckedChange = { onCheckedChange() },
+                        thumbContent = {
+                            if (state) {
+                                Icon(
+                                    modifier = Modifier.size(18.dp, 18.dp),
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = null
+                                )
+                            } else {
+                                Icon(
+                                    modifier = Modifier.size(18.dp, 18.dp),
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = null
+                                )
+                            }
+
                         }
+                    )
+                }
 
-                    }
-                )
             }
-
         }
     }
+
 }
