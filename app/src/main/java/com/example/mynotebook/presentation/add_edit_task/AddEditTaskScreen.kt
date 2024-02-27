@@ -74,7 +74,6 @@ fun AddEditTaskScreen(
 
     val taskTitle = viewModel.taskTitle.value
     val taskDescription = viewModel.taskDescription.value
-    val taskState = viewModel.taskState.value
     val alarmState = viewModel.alarmState.value
     val typeOfAlarm = viewModel.typeOfAlarm.value
     val selectedDays = viewModel.selectedDays.value
@@ -120,35 +119,12 @@ fun AddEditTaskScreen(
                     imageVector = Icons.Default.ArrowBackIosNew, contentDescription = "Back"
                 )
             }
-        }, actions = {
-            Switch(modifier = Modifier.padding(8.dp),
-                checked = taskState,
-                onCheckedChange = { state ->
-                    viewModel.onStateChanged(state)
-                },
-                thumbContent = {
-                    if (taskState) {
-                        Icon(
-                            modifier = Modifier.size(18.dp, 18.dp),
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null
-                        )
-                    } else {
-                        Icon(
-                            modifier = Modifier.size(18.dp, 18.dp),
-                            imageVector = Icons.Default.Close,
-                            contentDescription = null
-                        )
-                    }
-
-                })
         })
     }) {
         Column(
             modifier = Modifier.padding(it)
         ) {
-            OutlinedTextField(
-                value = taskTitle,
+            OutlinedTextField(value = taskTitle,
                 onValueChange = { title ->
                     viewModel.onTitleChanged(title)
                 },
@@ -158,8 +134,7 @@ fun AddEditTaskScreen(
                 label = { Text(text = "Task name") },
                 maxLines = 1
             )
-            OutlinedTextField(
-                value = taskDescription,
+            OutlinedTextField(value = taskDescription,
                 onValueChange = { description ->
                     viewModel.onDescriptionChanged(description)
                 },
@@ -175,14 +150,12 @@ fun AddEditTaskScreen(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.Transparent
-                    ),
-                    onClick = {
-                        viewModel.onDeleteTask()
-                        navController.navigateUp()
-                    }) {
+                Card(colors = CardDefaults.cardColors(
+                    containerColor = Color.Transparent
+                ), onClick = {
+                    viewModel.onDeleteTask()
+                    navController.navigateUp()
+                }) {
                     Row(
                         modifier = Modifier.padding(4.dp)
                     ) {
@@ -211,8 +184,7 @@ fun AddEditTaskScreen(
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    FilterChip(
-                        onClick = { showBottomSheet = true },
+                    FilterChip(onClick = { showBottomSheet = true },
                         label = { Text("Alarm") },
                         leadingIcon = {
                             Icon(
@@ -229,8 +201,7 @@ fun AddEditTaskScreen(
 
             if (showBottomSheet) {
                 ModalBottomSheet(onDismissRequest = { showBottomSheet = false }) {
-                    AddAlarmSheet(
-                        isAlarmActive = alarmState.isActive,
+                    AddAlarmSheet(isAlarmActive = alarmState.isActive,
                         onAlarmStateSwitch = { active -> viewModel.toggledAlarmSwitch(active) },
                         selectedType = typeOfAlarm,
                         onTypeChange = { state -> viewModel.onAlarmTypeChange(state) },
@@ -243,8 +214,7 @@ fun AddEditTaskScreen(
                             }
                             showBottomSheet = false
                         },
-                        onDismissRequest = { showBottomSheet = false }
-                    )
+                        onDismissRequest = { showBottomSheet = false })
                 }
             }
 

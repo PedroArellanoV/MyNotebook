@@ -23,6 +23,9 @@ class TaskScreenViewModel @Inject constructor(
     private val _taskTimer = mutableStateOf("")
     val taskAlarm = _taskTimer
 
+    private val _refreshKey = mutableStateOf(0)
+    val refreshKey = _refreshKey
+
     fun getTasks(){
         viewModelScope.launch{
             taskUseCases.getTasks.invoke().collect{
@@ -34,15 +37,16 @@ class TaskScreenViewModel @Inject constructor(
     }
 
     fun onStateChanged(task: TaskModel){
+        task.alarmState.isActive = !task.alarmState.isActive
         val newItem = TaskModel(
             title = task.title,
             description = task.description,
             id = task.id,
-            state = !task.state,
             alarmState = task.alarmState
         )
         viewModelScope.launch {
             taskUseCases.addTask.invoke(newItem.toTaskEntity())
+            _refreshKey.value++
         }
     }
 

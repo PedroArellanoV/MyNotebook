@@ -13,10 +13,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AlarmOff
+import androidx.compose.material.icons.filled.AlarmOn
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,16 +37,19 @@ fun TaskItem(
     hour: String,
     modifier: Modifier,
     onCheckedChange: () -> Unit,
-    onCardClicked:() -> Unit
+    onCardClicked: () -> Unit
 ) {
-    Box(modifier = modifier){
+    Box(modifier = modifier) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(60.dp)
                 .clickable {
                     onCardClicked()
-                }
+                },
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 8.dp
+            )
         ) {
             Row(
                 modifier = Modifier
@@ -62,12 +69,25 @@ fun TaskItem(
                     modifier = Modifier.padding(horizontal = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
+                    if (state) {
+                        Icon(
+                            imageVector = Icons.Default.AlarmOn,
+                            contentDescription = "Alarm On",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.AlarmOff,
+                            contentDescription = "Alarm Off",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    /*Text(
                         text = hour,
                         style = Typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
                         maxLines = 1
-                    )
+                    )*/
                     Spacer(
                         modifier = Modifier.width(4.dp)
                     )

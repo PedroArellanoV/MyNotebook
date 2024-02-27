@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -20,8 +22,9 @@ fun TaskScreen(
     navController: NavController
 ) {
     val taskList = viewModel.taskList.value
+    val refreshKey = viewModel.refreshKey.value
 
-    LaunchedEffect(viewModel) {
+    LaunchedEffect(refreshKey) {
         viewModel.getTasks()
     }
 
@@ -34,7 +37,7 @@ fun TaskScreen(
             items(taskList) { task ->
                 TaskItem(
                     title = task.title,
-                    state = task.state,
+                    state = task.alarmState.isActive,
                     hour = viewModel.getReminder(task),
                     onCheckedChange = { viewModel.onStateChanged(task) },
                     modifier = Modifier

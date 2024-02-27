@@ -36,9 +36,6 @@ class AddEditTaskViewModel @Inject constructor(
     private val _taskDescription = mutableStateOf("")
     val taskDescription: State<String> = _taskDescription
 
-    private val _taskState = mutableStateOf(false)
-    val taskState: State<Boolean> = _taskState
-
     private val _typeOfAlarm = mutableStateOf(Options.DAILY)
     val typeOfAlarm: State<Options> = _typeOfAlarm
 
@@ -60,10 +57,10 @@ class AddEditTaskViewModel @Inject constructor(
     val alarmState: State<AlarmState> = _alarmState
 
 
-    private val _selectedHour = mutableStateOf(alarmState.value.dailyAlarm?.hour ?: 23)
+    private val _selectedHour = mutableStateOf(alarmState.value.dailyAlarm?.hour ?: 12)
     val selectedHour: State<Int> = _selectedHour
 
-    private val _selectedMinute = mutableStateOf(alarmState.value.dailyAlarm?.minute ?: 45)
+    private val _selectedMinute = mutableStateOf(alarmState.value.dailyAlarm?.minute ?: 0)
     val selectedMinute: State<Int> = _selectedMinute
 
     init {
@@ -74,7 +71,6 @@ class AddEditTaskViewModel @Inject constructor(
                         currentTaskId = task.id
                         _taskTitle.value = task.title
                         _taskDescription.value = task.description
-                        _taskState.value = task.state
                         _alarmState.value = task.toDomain().alarmState
                     }
                     if (alarmState.value.dailyAlarm != null) {
@@ -82,6 +78,8 @@ class AddEditTaskViewModel @Inject constructor(
                         alarmState.value.dailyAlarm!!.selectedDays.forEach {
                             daysFromDb(it)
                         }
+                        _selectedHour.value = alarmState.value.dailyAlarm!!.hour
+                        _selectedMinute.value = alarmState.value.dailyAlarm!!.minute
                         Log.d("recuperar_alarma", alarmState.value.dailyAlarm.toString())
                     } else if (alarmState.value.calendarAlarm != null) {
                         _typeOfAlarm.value = Options.CALENDAR
@@ -98,10 +96,6 @@ class AddEditTaskViewModel @Inject constructor(
 
     fun onDescriptionChanged(newDescription: String) {
         _taskDescription.value = newDescription
-    }
-
-    fun onStateChanged(newState: Boolean) {
-        _taskState.value = newState
     }
 
     fun onAlarmTypeChange(index: Int) {
@@ -122,7 +116,6 @@ class AddEditTaskViewModel @Inject constructor(
                     TaskModel(
                         title = taskTitle.value,
                         description = taskDescription.value,
-                        state = taskState.value,
                         alarmState = alarmState.value,
                         id = currentTaskId
                     ).toTaskEntity()
@@ -144,7 +137,6 @@ class AddEditTaskViewModel @Inject constructor(
                 TaskModel(
                     taskTitle.value,
                     taskDescription.value,
-                    taskState.value,
                     alarmState.value,
                     currentTaskId
                 ).toTaskEntity()
