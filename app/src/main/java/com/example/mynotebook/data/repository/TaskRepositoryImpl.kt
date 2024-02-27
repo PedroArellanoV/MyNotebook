@@ -7,6 +7,7 @@ import com.example.mynotebook.domain.task.repository.TaskRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 
 class TaskRepositoryImpl(
     private val dao: TaskDao

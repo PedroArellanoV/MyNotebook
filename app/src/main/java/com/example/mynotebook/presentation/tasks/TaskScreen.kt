@@ -1,6 +1,5 @@
 package com.example.mynotebook.presentation.tasks
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.mynotebook.domain.task.model.toTaskEntity
 import com.example.mynotebook.presentation.tasks.composables.TaskItem
 import com.example.mynotebook.presentation.utils.Screens
 
@@ -21,7 +19,7 @@ fun TaskScreen(
     viewModel: TaskScreenViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    val taskList = viewModel.taskList.value.map { it.toTaskEntity() }
+    val taskList = viewModel.taskList.value
 
     LaunchedEffect(viewModel) {
         viewModel.getTasks()
@@ -37,7 +35,7 @@ fun TaskScreen(
                 TaskItem(
                     title = task.title,
                     state = task.state,
-                    hour = "10:00am",
+                    hour = viewModel.getReminder(task),
                     onCheckedChange = { viewModel.onStateChanged(task) },
                     modifier = Modifier
                         .padding(8.dp),

@@ -9,18 +9,13 @@ data class AlarmState(
 )
 
 data class DailyAlarm(
-    val selectedDays: List<DayOfWeek>,
-    val hour: Int,
-    val minute: Int
+    var selectedDays: List<String>,
+    var hour: Int,
+    var minute: Int
 )
 
 data class CalendarAlarm(
-    val selectedDate: LocalDate,
-    val hour: Int,
-    val minute: Int
-)
-
-data class DayOfWeek(
-    val day: String,
-    val active: Boolean
+    var selectedDate: LocalDate,
+    var hour: Int,
+    var minute: Int
 )

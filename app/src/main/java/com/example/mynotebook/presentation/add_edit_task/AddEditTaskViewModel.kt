@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mynotebook.data.data_source.model.toDomain
 import com.example.mynotebook.domain.task.model.TaskModel
 import com.example.mynotebook.domain.task.model.toTaskEntity
 import com.example.mynotebook.domain.task.use_cases.TaskUseCases
@@ -20,7 +21,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import java.util.Calendar
 import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,6 +60,12 @@ class AddEditTaskViewModel @Inject constructor(
     val alarmState: State<AlarmState> = _alarmState
 
 
+    private val _selectedHour = mutableStateOf(alarmState.value.dailyAlarm?.hour ?: 23)
+    val selectedHour: State<Int> = _selectedHour
+
+    private val _selectedMinute = mutableStateOf(alarmState.value.dailyAlarm?.minute ?: 45)
+    val selectedMinute: State<Int> = _selectedMinute
+
     init {
         savedStateHandle.get<Int>("taskId")?.let { taskId ->
             if (taskId != -1) {
@@ -69,6 +75,16 @@ class AddEditTaskViewModel @Inject constructor(
                         _taskTitle.value = task.title
                         _taskDescription.value = task.description
                         _taskState.value = task.state
+                        _alarmState.value = task.toDomain().alarmState
+                    }
+                    if (alarmState.value.dailyAlarm != null) {
+                        _typeOfAlarm.value = Options.DAILY
+                        alarmState.value.dailyAlarm!!.selectedDays.forEach {
+                            daysFromDb(it)
+                        }
+                        Log.d("recuperar_alarma", alarmState.value.dailyAlarm.toString())
+                    } else if (alarmState.value.calendarAlarm != null) {
+                        _typeOfAlarm.value = Options.CALENDAR
                     }
                 }
             }
@@ -139,24 +155,14 @@ class AddEditTaskViewModel @Inject constructor(
     fun onDailyAlarmSave(
         timePickerState: TimePickerState
     ) {
-        val cal = Calendar.getInstance()
-        cal.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
-        cal.set(Calendar.MINUTE, timePickerState.minute)
-        cal.isLenient = false
-
-
         _alarmState.value.dailyAlarm = DailyAlarm(
-            selectedDays = selectedDays.value.map { day ->
-                com.example.mynotebook.domain.task.utils.DayOfWeek(day.abbreviation, true)
+            selectedDays = selectedDays.value.map {
+                it.abbreviation
             },
             hour = timePickerState.hour,
             minute = timePickerState.minute,
         )
-        Log.d("alarm_saved", "${timePickerState.hour}:${timePickerState.minute}hs")
-    }
-
-    fun getDaySelection(){
-
+        Log.d("alarm_saved", "${alarmState.value.dailyAlarm}")
     }
 
     fun toggleDaySelection(day: DayOfWeek) {
@@ -167,6 +173,38 @@ class AddEditTaskViewModel @Inject constructor(
         }
     }
 
+    private fun daysFromDb(day: String) {
+        when (day) {
+            DayOfWeek.MON.abbreviation -> {
+                toggleDaySelection(DayOfWeek.MON)
+            }
+
+            DayOfWeek.TUE.abbreviation -> {
+                toggleDaySelection(DayOfWeek.TUE)
+            }
+
+            DayOfWeek.WED.abbreviation -> {
+                toggleDaySelection(DayOfWeek.WED)
+            }
+
+            DayOfWeek.THU.abbreviation -> {
+                toggleDaySelection(DayOfWeek.THU)
+            }
+
+            DayOfWeek.FRI.abbreviation -> {
+                toggleDaySelection(DayOfWeek.FRI)
+            }
+
+            DayOfWeek.SAT.abbreviation -> {
+                toggleDaySelection(DayOfWeek.SAT)
+            }
+
+            DayOfWeek.SUN.abbreviation -> {
+                toggleDaySelection(DayOfWeek.SUN)
+            }
+
+        }
+    }
     sealed class TaskUiEvent {
         data class ShowSnackbar(val message: String) : TaskUiEvent()
         data object SaveTask : TaskUiEvent()

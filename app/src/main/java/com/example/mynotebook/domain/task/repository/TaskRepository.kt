@@ -1,6 +1,7 @@
 package com.example.mynotebook.domain.task.repository
 
 import com.example.mynotebook.data.data_source.model.TaskEntity
+import com.example.mynotebook.domain.task.model.TaskModel
 import kotlinx.coroutines.flow.Flow
 
 interface TaskRepository {

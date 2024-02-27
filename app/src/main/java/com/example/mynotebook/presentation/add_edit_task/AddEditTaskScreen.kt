@@ -79,7 +79,8 @@ fun AddEditTaskScreen(
     val typeOfAlarm = viewModel.typeOfAlarm.value
     val selectedDays = viewModel.selectedDays.value
 
-    val timePickerState = rememberTimePickerState()
+    val timePickerState =
+        rememberTimePickerState(viewModel.selectedHour.value, viewModel.selectedMinute.value, false)
     val snackbarHostState = remember { SnackbarHostState() }
     var showBottomSheet by remember { mutableStateOf(false) }
 
