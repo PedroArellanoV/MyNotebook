@@ -3,15 +3,16 @@ package com.example.mynotebook.presentation.tasks.composables
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AlarmOff
 import androidx.compose.material.icons.filled.AlarmOn
@@ -33,7 +34,8 @@ import com.example.mynotebook.ui.theme.Typography
 @Composable
 fun TaskItem(
     title: String,
-    state: Boolean,
+    alarmState: Boolean,
+    description: String,
     hour: String,
     modifier: Modifier,
     onCheckedChange: () -> Unit,
@@ -43,7 +45,7 @@ fun TaskItem(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(60.dp)
+                .heightIn(max = 92.dp)
                 .clickable {
                     onCardClicked()
                 },
@@ -54,67 +56,85 @@ fun TaskItem(
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = title,
-                    style = Typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1,
-                    modifier = Modifier.widthIn(max = 150.dp)
-                )
-                Row(
-                    modifier = Modifier.padding(horizontal = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(top = 4.dp),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    if (state) {
-                        Icon(
-                            imageVector = Icons.Default.AlarmOn,
-                            contentDescription = "Alarm On",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Default.AlarmOff,
-                            contentDescription = "Alarm Off",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    /*Text(
-                        text = hour,
+                    Text(
+                        text = title,
                         style = Typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
-                        maxLines = 1
-                    )*/
-                    Spacer(
-                        modifier = Modifier.width(4.dp)
+                        maxLines = 1,
+                        color = MaterialTheme.colorScheme.primary
                     )
-                    Switch(
-                        checked = state,
-                        onCheckedChange = { onCheckedChange() },
-                        thumbContent = {
-                            if (state) {
-                                Icon(
-                                    modifier = Modifier.size(18.dp, 18.dp),
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = null
-                                )
-                            } else {
-                                Icon(
-                                    modifier = Modifier.size(18.dp, 18.dp),
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = null
-                                )
-                            }
-
-                        }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = description,
+                        style = Typography.titleMedium,
+                        fontWeight = FontWeight.Light,
+                        maxLines = 2
                     )
                 }
-
+                Column(
+                    modifier = Modifier
+                        .weight(1f),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        if (alarmState) {
+                            Icon(
+                                imageVector = Icons.Default.AlarmOn,
+                                contentDescription = "Alarm On",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.AlarmOff,
+                                contentDescription = "Alarm Off"
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Switch(
+                            checked = alarmState,
+                            onCheckedChange = { onCheckedChange() },
+                            thumbContent = {
+                                if (alarmState) {
+                                    Icon(
+                                        modifier = Modifier
+                                            .size(20.dp),
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                } else {
+                                    Icon(
+                                        modifier = Modifier
+                                            .size(20.dp),
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = null
+                                    )
+                                }
+                            }
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f).fillMaxWidth())
+                    Text(
+                        text = hour,
+                        style = Typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
+
         }
     }
-
 }

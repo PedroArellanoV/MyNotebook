@@ -7,8 +7,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,7 +26,9 @@ fun TaskScreen(
         viewModel.getTasks()
     }
 
-    Scaffold {
+    Scaffold (
+        modifier = Modifier.padding(4.dp)
+    ){
         LazyColumn(
             modifier = Modifier
                 .padding(it)
@@ -37,9 +37,10 @@ fun TaskScreen(
             items(taskList) { task ->
                 TaskItem(
                     title = task.title,
-                    state = task.alarmState.isActive,
+                    alarmState = task.alarmState.isActive,
                     hour = viewModel.getReminder(task),
                     onCheckedChange = { viewModel.onStateChanged(task) },
+                    description = task.description,
                     modifier = Modifier
                         .padding(8.dp),
                     onCardClicked = {

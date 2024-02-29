@@ -4,7 +4,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mynotebook.data.data_source.model.TaskEntity
 import com.example.mynotebook.data.data_source.model.toDomain
 import com.example.mynotebook.domain.task.model.TaskModel
 import com.example.mynotebook.domain.task.model.toTaskEntity
@@ -16,7 +15,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TaskScreenViewModel @Inject constructor(
     private val taskUseCases: TaskUseCases
-): ViewModel(){
+) : ViewModel() {
     private val _taskList = mutableStateOf<List<TaskModel>>(emptyList())
     val taskList: State<List<TaskModel>> = _taskList
 
@@ -26,9 +25,9 @@ class TaskScreenViewModel @Inject constructor(
     private val _refreshKey = mutableStateOf(0)
     val refreshKey = _refreshKey
 
-    fun getTasks(){
-        viewModelScope.launch{
-            taskUseCases.getTasks.invoke().collect{
+    fun getTasks() {
+        viewModelScope.launch {
+            taskUseCases.getTasks.invoke().collect {
                 _taskList.value = it.map { task ->
                     task.toDomain()
                 }
@@ -36,7 +35,7 @@ class TaskScreenViewModel @Inject constructor(
         }
     }
 
-    fun onStateChanged(task: TaskModel){
+    fun onStateChanged(task: TaskModel) {
         task.alarmState.isActive = !task.alarmState.isActive
         val newItem = TaskModel(
             title = task.title,
@@ -50,12 +49,18 @@ class TaskScreenViewModel @Inject constructor(
         }
     }
 
-    fun getReminder(item: TaskModel): String{
-        return if (item.alarmState.isActive && item.alarmState.dailyAlarm != null){
-            "${item.alarmState.dailyAlarm!!.hour}:${item.alarmState.dailyAlarm!!.minute}hs"
-        } else if (item.alarmState.isActive && item.alarmState.calendarAlarm != null){
+    fun getReminder(item: TaskModel): String {
+        val minute: String = if (item.alarmState.dailyAlarm!!.minute == 0) {
+            "00"
+        } else {
+            item.alarmState.dailyAlarm!!.minute.toString()
+        }
+
+        return if (item.alarmState.isActive && item.alarmState.dailyAlarm != null) {
+            "${item.alarmState.dailyAlarm!!.hour}:$minute hs"
+        } else if (item.alarmState.isActive && item.alarmState.calendarAlarm != null) {
             ""
-        } else{
+        } else {
             ""
         }
     }
