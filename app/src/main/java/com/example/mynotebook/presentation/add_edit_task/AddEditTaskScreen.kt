@@ -32,6 +32,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -80,6 +81,8 @@ fun AddEditTaskScreen(
 
     val timePickerState =
         rememberTimePickerState(viewModel.selectedHour.value, viewModel.selectedMinute.value, false)
+    val datePickerState =
+        rememberDatePickerState()
     val snackbarHostState = remember { SnackbarHostState() }
     var showBottomSheet by remember { mutableStateOf(false) }
 
@@ -208,6 +211,7 @@ fun AddEditTaskScreen(
                         toggleDaySelection = { day -> viewModel.toggleDaySelection(day) },
                         selectedDays = selectedDays,
                         timePickerState = timePickerState,
+                        datePickerState = datePickerState,
                         onSaveAlarm = {
                             if (typeOfAlarm.index == 0) {
                                 viewModel.onDailyAlarmSave(timePickerState)

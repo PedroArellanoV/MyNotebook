@@ -26,9 +26,9 @@ fun TaskScreen(
         viewModel.getTasks()
     }
 
-    Scaffold (
+    Scaffold(
         modifier = Modifier.padding(4.dp)
-    ){
+    ) {
         LazyColumn(
             modifier = Modifier
                 .padding(it)
@@ -38,7 +38,9 @@ fun TaskScreen(
                 TaskItem(
                     title = task.title,
                     alarmState = task.alarmState.isActive,
-                    hour = viewModel.getReminder(task),
+                    hour = if (task.alarmState.dailyAlarm != null) {
+                        viewModel.getReminder(task)
+                    } else "",
                     onCheckedChange = { viewModel.onStateChanged(task) },
                     description = task.description,
                     modifier = Modifier

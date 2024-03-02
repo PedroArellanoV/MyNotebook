@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -39,10 +40,11 @@ fun AddAlarmSheet(
     toggleDaySelection: (DayOfWeek) -> Unit,
     selectedDays: List<DayOfWeek>,
     timePickerState: TimePickerState,
+    datePickerState: DatePickerState,
     onSaveAlarm: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
-    var isActive = remember { mutableStateOf(isAlarmActive) }
+    val isActive = remember { mutableStateOf(isAlarmActive) }
 
     Column(
         modifier = Modifier
@@ -100,16 +102,11 @@ fun AddAlarmSheet(
                     timePickerState = timePickerState
                 )
             }
-
-            /*
             Options.CALENDAR -> {
-            Column {
-                    DatePicker(state = datePickerState)
-                }
+                CalendarSection(
+                    datePickerState = datePickerState
+                )
             }
-             */
-
-            else -> {}
         }
         Spacer(modifier = Modifier.height(4.dp))
         HorizontalDivider(modifier = Modifier.padding(16.dp))

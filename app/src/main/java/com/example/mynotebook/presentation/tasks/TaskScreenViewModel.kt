@@ -64,4 +64,10 @@ class TaskScreenViewModel @Inject constructor(
             ""
         }
     }
+
+    fun deleteTask(task: TaskModel) {
+        viewModelScope.launch {
+            taskUseCases.deleteTask.invoke(task.toTaskEntity())
+        }
+    }
 }
