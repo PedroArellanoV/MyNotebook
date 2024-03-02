@@ -34,13 +34,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.mynotebook.ui.theme.Typography
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskItem(
     title: String,
     alarmState: Boolean,
     description: String,
-    hour: String,
+    alarmDescription: String,
     modifier: Modifier,
     onCheckedChange: () -> Unit,
     onCardClicked: () -> Unit
@@ -134,7 +133,7 @@ fun TaskItem(
                         .weight(1f)
                         .fillMaxWidth())
                     Text(
-                        text = hour,
+                        text = alarmDescription,
                         style = Typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
                     )

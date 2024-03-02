@@ -1,6 +1,9 @@
 package com.example.mynotebook.presentation.add_edit_task
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.State
@@ -13,6 +16,7 @@ import com.example.mynotebook.domain.task.model.TaskModel
 import com.example.mynotebook.domain.task.model.toTaskEntity
 import com.example.mynotebook.domain.task.use_cases.TaskUseCases
 import com.example.mynotebook.domain.task.utils.AlarmState
+import com.example.mynotebook.domain.task.utils.CalendarAlarm
 import com.example.mynotebook.domain.task.utils.DailyAlarm
 import com.example.mynotebook.presentation.add_edit_task.utils.DayOfWeek
 import com.example.mynotebook.presentation.add_edit_task.utils.Options
@@ -21,9 +25,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class AddEditTaskViewModel @Inject constructor(
     private val taskUseCases: TaskUseCases,
@@ -157,6 +166,22 @@ class AddEditTaskViewModel @Inject constructor(
         Log.d("alarm_saved", "${alarmState.value.dailyAlarm}")
     }
 
+    fun onCalendarAlarmSave(
+        datePickerState: DatePickerState
+    ) {
+        _alarmState.value.calendarAlarm = CalendarAlarm(
+            selectedDate = formatToLocalDate(datePickerState.selectedDateMillis!!),
+            hour = 0,
+            minute = 0
+        )
+    }
+
+    private fun formatToLocalDate(millis: Long): LocalDate {
+        val instant = Instant.ofEpochMilli(millis)
+        val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+        return localDateTime.toLocalDate()
+    }
+
     fun toggleDaySelection(day: DayOfWeek) {
         _selectedDays.value = if (_selectedDays.value.contains(day)) {
             _selectedDays.value - day
@@ -197,6 +222,7 @@ class AddEditTaskViewModel @Inject constructor(
 
         }
     }
+
     sealed class TaskUiEvent {
         data class ShowSnackbar(val message: String) : TaskUiEvent()
         data object SaveTask : TaskUiEvent()

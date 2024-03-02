@@ -215,6 +215,8 @@ fun AddEditTaskScreen(
                         onSaveAlarm = {
                             if (typeOfAlarm.index == 0) {
                                 viewModel.onDailyAlarmSave(timePickerState)
+                            } else if (typeOfAlarm.index == 1){
+                                viewModel.onCalendarAlarmSave(datePickerState)
                             }
                             showBottomSheet = false
                         },

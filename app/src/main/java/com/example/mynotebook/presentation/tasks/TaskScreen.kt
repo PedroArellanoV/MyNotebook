@@ -38,9 +38,9 @@ fun TaskScreen(
                 TaskItem(
                     title = task.title,
                     alarmState = task.alarmState.isActive,
-                    hour = if (task.alarmState.dailyAlarm != null) {
-                        viewModel.getReminder(task)
-                    } else "",
+                    alarmDescription = if (task.alarmState.dailyAlarm != null || task.alarmState.calendarAlarm != null) {
+                        viewModel.getAlarmDescription(task)
+                    } else "" ,
                     onCheckedChange = { viewModel.onStateChanged(task) },
                     description = task.description,
                     modifier = Modifier

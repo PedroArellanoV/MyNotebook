@@ -49,20 +49,18 @@ class TaskScreenViewModel @Inject constructor(
         }
     }
 
-    fun getReminder(item: TaskModel): String {
-        val minute: String = if (item.alarmState.dailyAlarm!!.minute == 0) {
-            "00"
-        } else {
-            item.alarmState.dailyAlarm!!.minute.toString()
-        }
+    fun getAlarmDescription(item: TaskModel): String {
+        return if (item.alarmState.dailyAlarm != null){
+            val minute: String = if (item.alarmState.dailyAlarm!!.minute == 0) {
+                "00"
+            } else {
+                item.alarmState.dailyAlarm!!.minute.toString()
+            }
 
-        return if (item.alarmState.isActive && item.alarmState.dailyAlarm != null) {
             "${item.alarmState.dailyAlarm!!.hour}:$minute hs"
-        } else if (item.alarmState.isActive && item.alarmState.calendarAlarm != null) {
-            ""
-        } else {
-            ""
-        }
+        } else if (item.alarmState.calendarAlarm != null) {
+            "${item.alarmState.calendarAlarm!!.selectedDate}"
+        } else ""
     }
 
     fun deleteTask(task: TaskModel) {
