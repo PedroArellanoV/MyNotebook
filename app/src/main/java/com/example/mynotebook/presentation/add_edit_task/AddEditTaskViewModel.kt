@@ -1,5 +1,8 @@
 package com.example.mynotebook.presentation.add_edit_task
 
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -8,9 +11,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mynotebook.AlarmReceiver
+import com.example.mynotebook.TaskNotificationService
+import com.example.mynotebook.TaskNotificationService.Companion.NOTIFICATION_ID
 import com.example.mynotebook.data.data_source.model.toDomain
 import com.example.mynotebook.domain.task.model.TaskModel
 import com.example.mynotebook.domain.task.model.toTaskEntity
@@ -22,6 +29,7 @@ import com.example.mynotebook.presentation.add_edit_task.utils.DayOfWeek
 import com.example.mynotebook.presentation.add_edit_task.utils.Options
 import com.example.mynotebook.presentation.utils.InvalidCallException
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -71,6 +79,8 @@ class AddEditTaskViewModel @Inject constructor(
 
     private val _selectedMinute = mutableStateOf(alarmState.value.dailyAlarm?.minute ?: 0)
     val selectedMinute: State<Int> = _selectedMinute
+
+    val taskNotificationService = TaskNotificationService
 
     init {
         savedStateHandle.get<Int>("taskId")?.let { taskId ->
@@ -166,17 +176,22 @@ class AddEditTaskViewModel @Inject constructor(
         Log.d("alarm_saved", "${alarmState.value.dailyAlarm}")
     }
 
+    @RequiresApi(Build.VERSION_CODES.S)
     fun onCalendarAlarmSave(
-        datePickerState: DatePickerState
+        datePickerState: DatePickerState,
+        context: Context
     ) {
         _alarmState.value.calendarAlarm = CalendarAlarm(
             selectedDate = formatToLocalDate(datePickerState.selectedDateMillis!!),
             hour = 0,
             minute = 0
         )
+
+        TaskNotificationService(context).scheduleNotification()
     }
 
     private fun formatToLocalDate(millis: Long): LocalDate {
+        Log.d("date_in_millis", millis.toString())
         val instant = Instant.ofEpochMilli(millis)
         val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
         return localDateTime.toLocalDate()

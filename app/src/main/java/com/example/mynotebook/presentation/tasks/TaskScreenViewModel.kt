@@ -63,6 +63,10 @@ class TaskScreenViewModel @Inject constructor(
         } else ""
     }
 
+    fun getSelectedDaysToString(taskList: List<String>): String{
+        return ""
+    }
+
     fun deleteTask(task: TaskModel) {
         viewModelScope.launch {
             taskUseCases.deleteTask.invoke(task.toTaskEntity())

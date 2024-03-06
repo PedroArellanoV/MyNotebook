@@ -1,5 +1,8 @@
 package com.example.mynotebook.presentation.add_edit_task
 
+import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -51,6 +54,7 @@ import androidx.navigation.NavController
 import com.example.mynotebook.R
 import com.example.mynotebook.presentation.add_edit_task.composables.AddAlarmSheet
 import com.example.mynotebook.ui.theme.Typography
+import hilt_aggregated_deps._dagger_hilt_android_internal_modules_ApplicationContextModule
 import kotlinx.coroutines.flow.collectLatest
 
 
@@ -67,10 +71,12 @@ TODO:
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditTaskScreen(
-    navController: NavController, viewModel: AddEditTaskViewModel = hiltViewModel()
+    navController: NavController, viewModel: AddEditTaskViewModel = hiltViewModel(),
+    context: Context
 ) {
 
     val taskTitle = viewModel.taskTitle.value
@@ -216,7 +222,7 @@ fun AddEditTaskScreen(
                             if (typeOfAlarm.index == 0) {
                                 viewModel.onDailyAlarmSave(timePickerState)
                             } else if (typeOfAlarm.index == 1){
-                                viewModel.onCalendarAlarmSave(datePickerState)
+                                viewModel.onCalendarAlarmSave(datePickerState, context)
                             }
                             showBottomSheet = false
                         },

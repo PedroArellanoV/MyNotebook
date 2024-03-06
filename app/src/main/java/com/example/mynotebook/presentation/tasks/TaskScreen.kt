@@ -41,6 +41,7 @@ fun TaskScreen(
                     alarmDescription = if (task.alarmState.dailyAlarm != null || task.alarmState.calendarAlarm != null) {
                         viewModel.getAlarmDescription(task)
                     } else "" ,
+                    daysSelected = task.alarmState.dailyAlarm?.selectedDays ?: emptyList(),
                     onCheckedChange = { viewModel.onStateChanged(task) },
                     description = task.description,
                     modifier = Modifier

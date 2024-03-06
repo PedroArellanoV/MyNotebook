@@ -1,5 +1,6 @@
 package com.example.mynotebook.presentation.utils
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -7,12 +8,13 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.mynotebook.MyNotebookApp
 import com.example.mynotebook.presentation.main.MainScreen
 import com.example.mynotebook.presentation.add_edit_notes.AddEditNoteScreen
 import com.example.mynotebook.presentation.add_edit_task.AddEditTaskScreen
 
 @Composable
-fun Navigation(navController: NavController){
+fun Navigation(navController: NavController, context: Context){
     NavHost(
         navController = navController as NavHostController,
         startDestination = Screens.MainScreen.route){
@@ -41,7 +43,7 @@ fun Navigation(navController: NavController){
                 }
             )
         ){
-            AddEditTaskScreen(navController = navController)
+            AddEditTaskScreen(navController = navController, context = context)
         }
     }
 }
