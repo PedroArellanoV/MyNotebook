@@ -1,7 +1,9 @@
 package com.example.mynotebook.data.di
 
 import android.app.Application
+import android.content.Context
 import androidx.room.Room
+import com.example.mynotebook.TaskNotificationService
 import com.example.mynotebook.data.data_source.NoteDatabase
 import com.example.mynotebook.data.data_source.TaskDatabase
 import com.example.mynotebook.data.repository.NoteRepositoryImpl
@@ -56,6 +58,11 @@ object AppModule {
         )
     }
 
+
+    @Provides
+    fun provideTaskNotificationService(context: Context): TaskNotificationService{
+        return TaskNotificationService(context)
+    }
 
     @Provides
     fun providesTaskDatabase(app: Application): TaskDatabase {

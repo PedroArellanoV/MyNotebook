@@ -38,7 +38,6 @@ class TaskNotificationService(
         notificationManager.notify(NOTIFICATION_ID, notification)
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
     fun scheduleNotification() {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
