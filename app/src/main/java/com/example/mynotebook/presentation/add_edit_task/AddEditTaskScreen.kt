@@ -1,7 +1,10 @@
 package com.example.mynotebook.presentation.add_edit_task
 
+import android.app.AlarmManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
+import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,6 +24,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
@@ -58,20 +62,8 @@ import hilt_aggregated_deps._dagger_hilt_android_internal_modules_ApplicationCon
 import kotlinx.coroutines.flow.collectLatest
 
 
-/*
-TODO:
- Crear un Alert Dialog para la navegación hacia arriba.
- Si el usuario hizo cambios en los datos, antes de volver atrás
- avisar que puede puerder los cambios.
- Crear funcionalidad a la hora de seleccionar la alarma
- y trabajar con los datos(Crear una notificación diaria/semanal/mensual)
- para que el usuario reciba un recordatorio.
- */
 
 
-
-
-@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditTaskScreen(
@@ -85,9 +77,11 @@ fun AddEditTaskScreen(
     val typeOfAlarm = viewModel.typeOfAlarm.value
     val selectedDays = viewModel.selectedDays.value
 
+    val alarmPermission = viewModel.alarmPermission.value
+
     val timePickerState =
         rememberTimePickerState(viewModel.selectedHour.value, viewModel.selectedMinute.value, false)
-    val datePickerState =
+    val datePickerState: DatePickerState =
         rememberDatePickerState()
     val snackbarHostState = remember { SnackbarHostState() }
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -105,6 +99,12 @@ fun AddEditTaskScreen(
                     navController.navigateUp()
                 }
             }
+        }
+    }
+
+    LaunchedEffect(key1 = true){
+        if(viewModel.alarmPermission.value){
+            context.startActivity(Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM))
         }
     }
 

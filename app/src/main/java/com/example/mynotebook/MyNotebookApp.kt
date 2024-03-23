@@ -16,17 +16,16 @@ class MyNotebookApp : Application() {
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                TaskNotificationService.ALARM_CHANNEL_ID,
-                "Tasks",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            channel.description = "Tasks reminders"
+        val channel = NotificationChannel(
+            TaskNotification.CHANNEL_ID,
+            "Tasks",
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        channel.description = "Tasks reminders"
 
-            val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
+
     }
 }

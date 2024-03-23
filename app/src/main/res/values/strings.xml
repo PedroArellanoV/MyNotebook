@@ -15,4 +15,8 @@
     <string name="set_reminder">Set Reminder</string>
     <string name="note_title">Title</string>
     <string name="note_content">Note</string>
+
+    <!-- Notifications -->
+    <string name="notification_title">Task</string>
+    <string name="notification_message">Task message</string>
 </resources>

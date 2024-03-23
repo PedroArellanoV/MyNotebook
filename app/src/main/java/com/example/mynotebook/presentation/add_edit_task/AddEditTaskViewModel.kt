@@ -1,46 +1,39 @@
 package com.example.mynotebook.presentation.add_edit_task
 
+import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mynotebook.AlarmReceiver
-import com.example.mynotebook.TaskNotificationService
-import com.example.mynotebook.TaskNotificationService.Companion.NOTIFICATION_ID
+import com.example.mynotebook.TaskNotification
+import com.example.mynotebook.TaskNotification.Companion.NOTIFICATION_ID
+import com.example.mynotebook.TaskNotification.Companion.NOTIFICATION_TEXT
+import com.example.mynotebook.TaskNotification.Companion.NOTIFICATION_TITLE
 import com.example.mynotebook.data.data_source.model.toDomain
 import com.example.mynotebook.domain.task.model.TaskModel
 import com.example.mynotebook.domain.task.model.toTaskEntity
 import com.example.mynotebook.domain.task.use_cases.TaskUseCases
 import com.example.mynotebook.domain.task.utils.AlarmState
-import com.example.mynotebook.domain.task.utils.CalendarAlarm
 import com.example.mynotebook.domain.task.utils.DailyAlarm
 import com.example.mynotebook.presentation.add_edit_task.utils.DayOfWeek
 import com.example.mynotebook.presentation.add_edit_task.utils.Options
 import com.example.mynotebook.presentation.utils.InvalidCallException
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneId
 import javax.inject.Inject
 
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class AddEditTaskViewModel @Inject constructor(
     private val taskUseCases: TaskUseCases,
@@ -64,6 +57,9 @@ class AddEditTaskViewModel @Inject constructor(
 
     private var currentTaskId: Int? = null
 
+    private val _alarmPermission = mutableStateOf(false)
+    val alarmPermission: State<Boolean> = _alarmPermission
+
     private val _alarmState = mutableStateOf(
         AlarmState(
             isActive = false,
@@ -79,8 +75,6 @@ class AddEditTaskViewModel @Inject constructor(
 
     private val _selectedMinute = mutableStateOf(alarmState.value.dailyAlarm?.minute ?: 0)
     val selectedMinute: State<Int> = _selectedMinute
-
-    val taskNotificationService = TaskNotificationService
 
     init {
         savedStateHandle.get<Int>("taskId")?.let { taskId ->
@@ -176,25 +170,44 @@ class AddEditTaskViewModel @Inject constructor(
         Log.d("alarm_saved", "${alarmState.value.dailyAlarm}")
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
     fun onCalendarAlarmSave(
         datePickerState: DatePickerState,
         context: Context
     ) {
-        _alarmState.value.calendarAlarm = CalendarAlarm(
-            selectedDate = formatToLocalDate(datePickerState.selectedDateMillis!!),
-            hour = 0,
-            minute = 0
+        val intent = Intent(context.applicationContext, TaskNotification::class.java)
+        intent.putExtra(NOTIFICATION_TITLE, taskTitle.value)
+        intent.putExtra(NOTIFICATION_TEXT, taskDescription.value)
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            context.applicationContext,
+            NOTIFICATION_ID,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
-        TaskNotificationService(context).scheduleNotification()
-    }
+        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val time = datePickerState.selectedDateMillis
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 
-    private fun formatToLocalDate(millis: Long): LocalDate {
-        Log.d("date_in_millis", millis.toString())
-        val instant = Instant.ofEpochMilli(millis)
-        val localDateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
-        return localDateTime.toLocalDate()
+            if (alarmManager.canScheduleExactAlarms()) {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    time!!,
+                    pendingIntent
+                )
+            } else {
+                _alarmPermission.value = true
+            }
+
+        } else {
+
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                time!!,
+                pendingIntent
+            )
+        }
+
     }
 
     fun toggleDaySelection(day: DayOfWeek) {

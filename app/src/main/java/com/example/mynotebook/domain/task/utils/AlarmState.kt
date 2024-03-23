@@ -7,7 +7,7 @@ data class AlarmState(
     var isActive: Boolean,
     var dailyAlarm: DailyAlarm?,
     var calendarAlarm: CalendarAlarm?
-): Parcelable
+)
 
 data class DailyAlarm(
     var selectedDays: List<String>,
